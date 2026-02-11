@@ -132,6 +132,12 @@
   box-shadow: 0 0 0 3px rgba(42, 109, 245, 0.15);
 }
 
+.auth-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 .auth-actions {
   margin-top: 12px;
   display: flex;

@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { signup } from "../../services/auth.service";
+import { validateEmail, validatePassword } from "../../utils/authValidation";
 import "./auth.css";
 
 const Signup = () => {
@@ -22,12 +23,30 @@ const Signup = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
 
+    if (name.trim().length < 2) {
+      setError("Name must be at least 2 characters.");
+      return;
+    }
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const data = await signup(name, email, password);
+      const data = await signup(name.trim(), email.trim().toLowerCase(), password);
       localStorage.setItem("token", data.token);
       setSuccess("Account created. You are now signed in.");
     } catch (err: any) {
@@ -88,11 +107,12 @@ const Signup = () => {
               <input
                 id="password"
                 type="password"
-                placeholder="At least 8 characters"
+                placeholder="8+ chars, Aa1 required"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <small className="auth-hint">Use at least 8 characters, with uppercase, lowercase, and a number.</small>
             </div>
             <div className="auth-actions">
               <button className="auth-button" type="submit" disabled={loading}>

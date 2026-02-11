@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { login } from "../../services/auth.service";
+import { validateEmail, validateLoginPassword } from "../../utils/authValidation";
 import "./auth.css";
 
 const Login = () => {
@@ -21,12 +22,25 @@ const Login = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
 
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+
+    const passwordError = validateLoginPassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const data = await login(email, password);
+      const data = await login(email.trim().toLowerCase(), password);
       localStorage.setItem("token", data.token);
       setSuccess("Welcome back. You are logged in.");
     } catch (err: any) {
