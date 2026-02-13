@@ -9,6 +9,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     if (error || success) {
@@ -25,11 +26,13 @@ const Login = () => {
     setError(null);
     setSuccess(null);
 
-    const emailError = validateEmail(email);
-    if (emailError) {
-      setError(emailError);
+    const err = validateEmail(email);
+    if (err) {
+      setError(err);
+      setEmailError(err);
       return;
     }
+    setEmailError(null);
 
     const passwordError = validateLoginPassword(password);
     if (passwordError) {
@@ -82,9 +85,20 @@ const Login = () => {
                 type="email"
                 placeholder="you@company.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
+                onBlur={() => setEmailError(validateEmail(email))}
                 required
+                aria-invalid={!!emailError}
+                aria-describedby={emailError ? "login-email-error" : undefined}
               />
+              {emailError && (
+                <span id="login-email-error" className="auth-field-error" role="alert">
+                  {emailError}
+                </span>
+              )}
             </div>
             <div className="auth-field">
               <label htmlFor="password">Password</label>

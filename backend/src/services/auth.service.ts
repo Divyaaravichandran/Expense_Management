@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { User } from "../models/User";
 import { HttpError } from "../utils/HttpError";
@@ -9,9 +9,14 @@ const signToken = (userId: string) => {
   if (!secret) {
     throw new Error("JWT_SECRET is not set");
   }
-  return jwt.sign({ sub: userId }, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || "7d"
-  });
+
+  return jwt.sign(
+    { sub: userId },
+    secret,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] ?? "7d"
+    }
+  );
 };
 
 export const signupUser = async (name: string, email: string, password: string) => {
